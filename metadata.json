@@ -1,0 +1,6 @@
+{
+  "name": "WordTrail",
+  "description": "An active, user-directed vocabulary expansion web app. Enter your own new words, scan custom texts to extract learning candidates, and review systematically with the scientific Ebbinghaus forgetting curve.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
