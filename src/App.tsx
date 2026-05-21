@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { 
   Sparkles, Plus, BookOpen, Clock, Lightbulb, CheckCircle2, ChevronDown, ChevronUp,
   Volume2, Search, Trash2, Calendar, Sun, Moon, Languages, Layers, AlertCircle,
-  FileText, ArrowRight, Star, ExternalLink, HelpCircle, Save, Check, X, Edit3, Download, Upload, Award, BarChart3, Flame
+  FileText, ArrowRight, Star, ExternalLink, HelpCircle, Save, Check, X
 } from "lucide-react";
 import { Word, Notebook, STAGE_LABELS, STAGE_LABELS_EN, EBBINGHAUS_INTERVALS } from "./types";
 import { 
@@ -10,9 +10,6 @@ import {
 } from "./lib/storage";
 import AddWordModal from "./components/AddWordModal";
 import TextImportScanner from "./components/TextImportScanner";
-import EditWordModal from "./components/EditWordModal";
-import StatsModal from "./components/StatsModal";
-import { deleteNotebook, exportAllData, importAllData, checkinToday, getStreakData, StreakData, recordDailyStats, getStatsHistory } from "./lib/storage";
 
 export default function App() {
   // State for raw lists
@@ -26,11 +23,6 @@ export default function App() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [expandedWordId, setExpandedWordId] = useState<string | null>(null);
-  const [editingWord, setEditingWord] = useState<Word | null>(null);
-  const [isStatsOpen, setIsStatsOpen] = useState(false);
-  const [streakData, setStreakData] = useState<StreakData>(() => getStreakData());
-  const [showImportDialog, setShowImportDialog] = useState(false);
-  const [importText, setImportText] = useState("");
 
   // Theme & Language Settings (persist inside localStorage)
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -190,7 +182,6 @@ export default function App() {
   // Synchronize localStorage mutations dynamically
   const reloadWords = () => {
     setWords(getWords());
-    setStreakData(getStreakData());
   };
 
   const handleWordDeleted = (id: string) => {
@@ -262,7 +253,6 @@ export default function App() {
     
     // Register metric outcomes to localStorage
     const updated = registerReviewResult(currentReviewWord.id, result);
-    recordDailyStats(result);
     reloadWords();
 
     setAnswerRevealed(false);
@@ -275,58 +265,6 @@ export default function App() {
     } else {
       setCurrentReviewIndex(currentReviewIndex + 1);
     }
-  };
-
-  const handleEditWord = (word: Word) => {
-    setEditingWord(word);
-  };
-
-  const handleDeleteNotebook = (id: string) => {
-    if (window.confirm(lang === "zh" ? "确定删除此笔记本吗？单词不会被删除。" : "Delete this notebook? Words will not be deleted.")) {
-      deleteNotebook(id);
-      setNotebooks(getNotebooks());
-      if (activeNotebook === id) setActiveNotebook("all");
-    }
-  };
-
-  const handleCheckin = () => {
-    const result = checkinToday();
-    setStreakData(result);
-  };
-
-  const handleExport = () => {
-    const data = exportAllData();
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `wordtrail-backup-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImportFromFile = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = (e: any) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const jsonText = ev.target?.result as string;
-          const result = importAllData(jsonText);
-          setWords(result.words);
-          setNotebooks(result.notebooks);
-          alert(lang === "zh" ? `成功导入 ${result.words.length} 个单词` : `Imported ${result.words.length} words`);
-        } catch (e) {
-          alert(lang === "zh" ? "导入失败，请检查数据格式" : "Import failed, check data format");
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
 
   const handleSpeak = (text: string) => {
@@ -361,16 +299,20 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300 animate-[fadeIn_0.4s_ease-out]">
       
       {/* Upper Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors">
+      <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors animate-[fadeIn_0.5s_ease-out]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shrink-0 shadow-sm shadow-indigo-1200 transition">
-              <Sparkles className="w-5.5 h-5.5" />
-            </div>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="shrink-0">
+            <rect width="40" height="40" rx="10" fill="#4F46E5" />
+            <path d="M10 26V12L20 16L30 12V26L20 30L10 26Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <path d="M20 16V30" stroke="white" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 3"/>
+            <circle cx="14" cy="20" r="1.5" fill="#A5B4FC"/>
+            <circle cx="26" cy="20" r="1.5" fill="#A5B4FC"/>
+          </svg>
             <div>
               <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-50" id="app-title-header">{T.brandName}</h1>
               <p className="text-[10px] text-slate-500 dark:text-slate-300 font-medium hidden sm:block">{T.tagline}</p>
@@ -389,36 +331,17 @@ export default function App() {
               <span className="hidden xs:inline">{lang === "zh" ? "EN" : "中文"}</span>
             </button>
 
+            {/* Logout Button */}
+            <button
+              onClick={() => { localStorage.removeItem("wordtrail_user"); window.location.reload(); }}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
+              title="退出登录 / Logout"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span className="hidden xs:inline text-rose-500">{lang === "zh" ? "退出" : "Logout"}</span>
+            </button>
+
             {/* Light/Dark Toggle */}
-            <button
-              onClick={() => { handleCheckin(); }}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
-              title="签到打卡"
-            >
-              <Flame className={`w-4 h-4 ${streakData.currentStreak > 0 ? "text-orange-500" : "text-slate-500"}`} />
-              <span className="text-[10px] font-bold">{streakData.currentStreak}</span>
-            </button>
-            <button
-              onClick={() => setIsStatsOpen(true)}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
-              title="学习统计"
-            >
-              <BarChart3 className="w-4 h-4 text-indigo-500" />
-            </button>
-            <button
-              onClick={() => handleExport()}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
-              title="导出数据"
-            >
-              <Download className="w-4 h-4 text-emerald-500" />
-            </button>
-            <button
-              onClick={() => handleImportFromFile()}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
-              title="导入数据"
-            >
-              <Upload className="w-4 h-4 text-amber-500" />
-            </button>
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-semibold select-none border border-slate-200/40 dark:border-slate-800/60"
@@ -1042,14 +965,7 @@ export default function App() {
                                   className="text-xs font-semibold px-2 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-850 text-slate-750 dark:text-slate-300 flex items-center gap-1.5 transition select-none"
                                 >
                                   <Volume2 className="w-3.5 h-3.5" />
-                                  朗读发音
-                                </button>
-                                <button
-                                  onClick={() => handleEditWord(item)}
-                                  className="text-xs font-semibold px-2 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950 dark:hover:bg-indigo-850 text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5 transition select-none"
-                                >
-                                  <Edit3 className="w-3.5 h-3.5" />
-                                  编辑
+                                  朗读发音 (Speak)
                                 </button>
                               </div>
 
@@ -1423,20 +1339,11 @@ export default function App() {
                       }`}
                     >
                       <span className="truncate pr-2">
-                        {nb.name}
+                        🔖 {nb.name}
                       </span>
-                      <div className="flex items-center gap-1">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeNotebook === nb.id ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-655"}`}>
                         {numWords}
                       </span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDeleteNotebook(nb.id); }}
-                        className={`p-1 rounded-full transition ${activeNotebook === nb.id ? "text-white/60 hover:text-white hover:bg-white/20" : "text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"}`}
-                        title={lang === "zh" ? "删除" : "Delete"}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                      </div>
                     </button>
                   );
                 })}
@@ -1457,23 +1364,12 @@ export default function App() {
           reloadWords();
         }}
       />
-      <EditWordModal
-        isOpen={editingWord !== null}
-        onClose={() => setEditingWord(null)}
-        word={editingWord}
-        notebooks={notebooks}
-        lang={lang}
-        onWordUpdated={() => {
-          reloadWords();
-        }}
-      />
-      <StatsModal
-        isOpen={isStatsOpen}
-        onClose={() => setIsStatsOpen(false)}
-        lang={lang}
-        totalWords={words.length}
-        masteredWords={masteryWords.length}
-      />
     </div>
   );
 }
+
+
+
+
+
+

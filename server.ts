@@ -88,6 +88,80 @@ app.post("/api/words/extract", async (req, res) => {
   } catch (error) { console.error(error); return res.status(500).json({ error: error.message }); }
 });
 
+
+// User Auth API (in-memory storage)
+interface AuthUser {
+  id: string;
+  username: string;
+  password: string;
+  createdAt: number;
+}
+
+const users: AuthUser[] = [];
+
+// Register
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || typeof username !== "string" || username.trim() === "") {
+      return res.status(400).json({ error: "Username required" });
+    }
+    if (!password || typeof password !== "string" || password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters" });
+    }
+    const trimmedUsername = username.trim();
+    const existing = users.find(u => u.username === trimmedUsername);
+    if (existing) {
+      return res.status(409).json({ error: "Username already exists" });
+    }
+    const newUser: AuthUser = {
+      id: `user-${Date.now()}`,
+      username: trimmedUsername,
+      password,
+      createdAt: Date.now(),
+    };
+    users.push(newUser);
+    return res.json({
+      user: { id: newUser.id, username: newUser.username },
+      message: "Registration successful",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password required" });
+    }
+    const user = users.find(u => u.username === username.trim() && u.password === password);
+    if (!user) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+    return res.json({
+      user: { id: user.id, username: user.username },
+      message: "Login successful",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Check username availability
+app.post("/api/auth/check-username", async (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ error: "Username required" });
+    const exists = users.some(u => u.username === username.trim());
+    return res.json({ available: !exists });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Boot
 async function boot() {
   if (process.env.NODE_ENV !== "production") {

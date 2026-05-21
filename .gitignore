@@ -4,5 +4,9 @@ dist/
 coverage/
 .DS_Store
 *.log
+*.err
+*.bak
+*.tgz
+*.py
 .env*
 !.env.example
