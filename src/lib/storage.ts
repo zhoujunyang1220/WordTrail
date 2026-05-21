@@ -1,4 +1,4 @@
-import { Word, Notebook, EBBINGHAUS_INTERVALS } from "../types";
+﻿import { Word, Notebook, EBBINGHAUS_INTERVALS } from "../types";
 
 const LOCAL_STORAGE_WORDS_KEY = "active_vocab_words_v1";
 const LOCAL_STORAGE_NOTEBOOKS_KEY = "active_vocab_notebooks_v1";
@@ -10,113 +10,10 @@ const DEFAULT_NOTEBOOKS: Notebook[] = [
     description: "日常学习及阅读中随手记录的生词",
     createdAt: Date.now(),
     color: "from-blue-500/10 to-indigo-500/10 border-blue-200 text-blue-700",
-  },
-  {
-    id: "notebook-reading",
-    name: "学术精读与科技",
-    description: "来自学术论文、英文新闻和专业书籍的词汇",
-    createdAt: Date.now() - 24 * 60 * 60 * 1000,
-    color: "from-emerald-500/10 to-teal-500/10 border-emerald-200 text-emerald-700",
-  },
-  {
-    id: "notebook-exam",
-    name: "备考核心拔高",
-    description: "雅思/托福、GRE等高难度核心高频词",
-    createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-    color: "from-amber-500/10 to-orange-500/10 border-amber-200 text-amber-700",
   }
 ];
 
-const SEED_WORDS: Word[] = [
-  {
-    id: "seed-1",
-    word: "ubiquitous",
-    phonetic: "/juːˈbɪkwɪtəs/",
-    pos: "adj.",
-    chineseDefinition: "无处不在的，普遍存在的",
-    englishDefinition: "Present, appearing, or found everywhere.",
-    rootAffix: "【词根】ubique (Latin) 表示“到处”。后缀 -ous 表示形容词，“满含…的”。",
-    memoryHook: "谐音记忆：'you-be-quite-us'：你们都要安静（be quiet），因为老师【无处不在】地盯着我们。",
-    phrases: ["ubiquitous technology (无处不在的技术)", "ubiquitous access (随时随地的访问)"],
-    sentences: [
-      {
-        en: "Smartphones have become ubiquitous in daily life, reshaping how we communicate.",
-        zh: "智能手机在日常生活中已变得无处不在，重塑了我们的交流方式。"
-      },
-      {
-        en: "The brand's ubiquitous advertising campaign ensured that everyone knew their name.",
-        zh: "该品牌铺天盖地的广告攻势确保了每个人都知道他们的名字。"
-      }
-    ],
-    notebookId: "notebook-default",
-    stage: 3, // Already reviewed slightly
-    createdAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-    lastReviewAt: Date.now() - 12 * 60 * 60 * 1000,
-    nextReviewAt: Date.now() + 12 * 60 * 60 * 1000, // Due in 12 hours from now
-    reviewHistory: [
-      { timestamp: Date.now() - 36 * 60 * 1000, result: "correct", oldStage: 1, newStage: 2 },
-      { timestamp: Date.now() - 12 * 60 * 60 * 1000, result: "correct", oldStage: 2, newStage: 3 }
-    ]
-  },
-  {
-    id: "seed-2",
-    word: "ephemeral",
-    phonetic: "/ɪˈfemərəl/",
-    pos: "adj.",
-    chineseDefinition: "短暂的，朝生暮死的",
-    englishDefinition: "Lasting for a very short time.",
-    rootAffix: "【词源】源自希腊语 ephemeros（仅一日的）。epi- (在...之上) + hemera (日/天)。",
-    memoryHook: "联想记忆：e- (外) + phe- (发声/呈现)：露水蒸发后声音和现象在外面也只停留【短暂的一瞬】。",
-    phrases: ["ephemeral beauty (短暂的美丽)", "ephemeral nature of fame (名声的瞬时性)"],
-    sentences: [
-      {
-        en: "The beauty of cherry blossoms is beautiful but ephemeral, lasting only a few days.",
-        zh: "樱花虽美但花期短暂，仅仅能持续几天时间。"
-      },
-      {
-        en: "In the digital age, social media trends are highly ephemeral.",
-        zh: "在数字时代，社交媒体上的潮流趋势往往如过眼云烟、稍纵即逝。"
-      }
-    ],
-    notebookId: "notebook-reading",
-    stage: 0, // Brand new
-    createdAt: Date.now() - 1000,
-    nextReviewAt: Date.now() - 5000, // Due now!
-    reviewHistory: []
-  },
-  {
-    id: "seed-3",
-    word: "serendipity",
-    phonetic: "/ˌserənˈdɪpəti/",
-    pos: "n.",
-    chineseDefinition: "（意外发现美好事物的）机缘，缘分，幸运的巧合",
-    englishDefinition: "The occurrence and development of events by chance in a happy or beneficial way.",
-    rootAffix: "【典故】源于波斯童话《塞伦迪普的三个王子》(The Three Princes of Serendip)，故事中王子总是能意外地发现奇珍异宝。",
-    memoryHook: "记忆挂钩：'死人肚皮啼'（谐音）- 绝境逢生：相传古代勇士在废墟中以为别人死去了，耳朵贴在肚皮上居然听到啼哭声，【意外地撞大运】救出了生还者。",
-    phrases: ["by sheer serendipity (纯属巧合)", "a serendipitous finding (意外的发现)"],
-    sentences: [
-      {
-        en: "It was a scientific serendipity when Alexander Fleming discovered penicillin by accident.",
-        zh: "当亚历山大·弗莱明偶然发现青霉素的时候，可以说是科学史上的一次奇妙机缘。"
-      },
-      {
-        en: "Meeting my old school friend in a foreign train terminal was pure serendipity.",
-        zh: "在国外的火车站台遇到我的老校友纯属幸运的巧合。"
-      }
-    ],
-    notebookId: "notebook-exam",
-    stage: 5, // Mastered or far in curve
-    createdAt: Date.now() - 7 * 24 * 60 * 60 * 1000,
-    lastReviewAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-    nextReviewAt: Date.now() + 2 * 24 * 60 * 60 * 1000, // Due in 2 days
-    reviewHistory: [
-      { timestamp: Date.now() - 6 * 24 * 60 * 60 * 1000, result: "correct", oldStage: 1, newStage: 2 },
-      { timestamp: Date.now() - 5 * 24 * 60 * 60 * 1000, result: "correct", oldStage: 2, newStage: 3 },
-      { timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000, result: "correct", oldStage: 3, newStage: 4 },
-      { timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000, result: "correct", oldStage: 4, newStage: 5 }
-    ]
-  }
-];
+const SEED_WORDS: Word[] = [];
 
 export function getWords(): Word[] {
   if (typeof window === "undefined") return [];
@@ -356,3 +253,4 @@ export function recordDailyStats(result: "correct" | "incorrect"): void {
     localStorage.setItem(STATS_KEY, JSON.stringify(history));
   }
 }
+

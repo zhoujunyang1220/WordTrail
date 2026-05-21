@@ -10,3 +10,5 @@ coverage/
 *.py
 .env*
 !.env.example
+
+.vercel
